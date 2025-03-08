@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Miltiplay</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&amp;family=Space+Mono:ital@1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            margin: 0;
+            color: #007BFF;
+            font-family: 'Space Mono', monospace;
+            font-style: italic;
+            font-weight: 400;
+        }
+        
+        .subtitle {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 400;
+        }
+        
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        
+        .center-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        
+        .left-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .right-controls {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        button i {
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #006FCE;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .grid-container {
+            display: grid;
+            gap: 10px;
+            min-height: 500px;
+            border: none;
+            background-color: #121212;
+            position: relative;
+        }
+        
+        .empty-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            color: #888;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .empty-grid i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        
+        .empty-grid p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .empty-grid .upload-prompt {
+            cursor: pointer;
+            color: #007BFF;
+            transition: color 0.3s;
+        }
+        
+        .empty-grid .upload-prompt:hover {
+            color: #006FCE;
+            text-decoration: underline;
+        }
+        
+        .drag-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 123, 255, 0.2);
+            border: 3px dashed #007BFF;
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            color: #007BFF;
+            font-size: 24px;
+        }
+        
+        .drag-overlay i {
+            font-size: 48px;
+            margin-right: 15px;
+        }
+        
+        .video-cell {
+            background-color: #2a2a2a;
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+        }
+        
+        .video-cell video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #000;
+        }
+        
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .video-cell:hover .video-controls {
+            opacity: 1;
+        }
+        
+        .timeline-container {
+            width: 100%;
+            height: 12px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .timeline-bar {
+            position: absolute;
+            top: 5px;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        .timeline-progress {
+            position: absolute;
+            top: 5px;
+            left: 0;
+            height: 3px;
+            width: 0%;
+            background-color: #007BFF;
+            border-radius: 3px;
+        }
+        
+        .timeline-handle {
+            position: absolute;
+            top: 1px;
+            left: 0%;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+        
+        .timeline-container:hover .timeline-bar {
+            height: 5px;
+            top: 4px;
+        }
+        
+        .timeline-container:hover .timeline-progress {
+            height: 5px;
+            top: 4px;
+        }
+        
+        .timeline-container:hover .timeline-handle {
+            display: block;
+        }
+        
+        .video-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .time-display {
+            font-size: 12px;
+            color: white;
+            margin-left: 5px;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 100;
+            border: none;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s, background-color 0.3s;
+        }
+        
+        .video-cell:hover .delete-btn {
+            opacity: 1;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        
+        .placeholder:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        
+        .placeholder.drag-over {
+            background-color: rgba(0, 123, 255, 0.2);
+            border: 2px dashed #007BFF;
+        }
+        
+        .placeholder i {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #007BFF;
+        }
+        
+        .placeholder p {
+            margin: 5px 0;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-label {
+            font-family: 'Roboto', sans-serif; /* Match button font */
+            font-size: 14px; /* Match other buttons */
+            padding: 8px 16px; /* Ensure padding is the same */
+            height: 40px; /* Explicit height match */
+            line-height: normal; /* Prevent stretching */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box; /* Ensure consistent box model */
+            border-radius: 4px; /* Match button shape */
+            border: none;
+            background-color: #007BFF; /* Match other button colors */
+            color: white;
+            font-weight: 400; /* Ensure text weight matches */
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .file-label:hover {
+            background-color: #0056b3; /* Match hover effect */
+        }
+            font-size: 14px; /* Match other buttons */
+            padding: 8px 16px; /* Ensure padding is the same */
+            height: 40px; /* Explicit height match */
+            line-height: normal; /* Prevent stretching */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box; /* Ensure consistent box model */
+            border-radius: 4px; /* Match button shape */
+            border: none;
+            background-color: #007BFF; /* Match other button colors */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .file-label:hover {
+            background-color: #0056b3; /* Match hover effect */
+        }
+            font-size: 14px; /* Match other buttons */
+            padding: 8px 16px; /* Ensure padding is the same */
+            height: 40px; /* Explicit height match */
+            line-height: normal; /* Prevent stretching */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box; /* Ensure consistent box model */
+        }
+    font-size: 14px; /* Match other buttons */
+    padding: 6px 16px;
+    height: 40px;
+    line-height: 28px;
+    display: flex;
+    align-items: center;
+    font-size: 14px; /* Match other buttons */
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    font-size: 14px; /* Match other buttons */
+    height: 40px; /* Ensuring uniform height across all controls */ /* Match the height of select dropdown */
+            display: inline-block;
+            background-color: #007BFF;
+            color: #f0f0f0;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            height: 40px; /* Ensuring uniform height across all controls */
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .file-label:hover {
+            background-color: #006FCE;
+        }
+        
+        select {
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            height: 40px; /* Ensuring uniform height across all controls */ /* Match the height of buttons */
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        @media (max-width: 1100px) {
+            .control-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .left-controls,
+            .center-controls,
+            .right-controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .right-controls {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<header>
+<a href="https://cammrowland.com" style="text-decoration: none;">
+<img alt="Miltiplay Logo" src="https://media.discordapp.net/attachments/1048080832742555648/1347773001915039845/Asset_2.png?ex=67cd0aec&amp;is=67cbb96c&amp;hm=9d821ecaf3b9f5a930174cad494ca2f284c382b4ca8e3d7757466d9d86436cbd&amp;=&amp;format=webp&amp;quality=lossless" style="max-width: 200px; height: auto;"/>
+</a>
+<span class="subtitle">Compare Versions. Side by Side.</span>
+</header>
+<div class="control-row">
+<div class="left-controls">
+<label class="file-label" for="file-input"><i class="fas fa-plus-circle" style="margin-right: 6px;"></i> Add Videos</label>
+<input accept="video/*" class="file-input" id="file-input" multiple="" onchange="handleFileSelect(event)" type="file"/>
+</div>
+<div class="center-controls">
+<button id="play-pause-all" onclick="togglePlayPauseAll()"><i class="fas fa-play"></i> Play</button>
+<button id="rewind-all" onclick="rewindAllVideos()"><i class="fas fa-undo"></i> Rewind</button>
+<button id="mute-toggle" onclick="toggleMuteAll()"><i class="fas fa-volume-up"></i> Mute</button>
+<button id="sync-all" onclick="syncAllVideos()"><i class="fas fa-sync"></i> Sync</button>
+<button id="reset-all" onclick="resetGrid()"><i class="fas fa-trash"></i> Reset</button>
+</div>
+<div class="right-controls">
+<select id="grid-layout" onchange="updateGridLayout()">
+<option value="1">1 Column</option>
+<option selected="" value="2">2 Columns</option>
+<option value="3">3 Columns</option>
+<option value="4">4 Columns</option>
+</select>
+</div>
+</div>
+<div class="grid-container" id="grid-container">
+<div class="drag-overlay" id="drag-overlay">
+<i class="fas fa-file-upload"></i>
+<span>Drop videos here</span>
+</div>
+</div>
+</div>
+<script>
+        let videoFiles = [];
+        let currentGrid = { rows: 2, cols: 2 };
+        
+        // Global flags to track video states
+        let areVideosPlaying = false;
+        let areVideosMuted = false;
+        
+        // Initialize the grid on page load and set up drag and drop events
+        document.addEventListener('DOMContentLoaded', function() {
+            updateGridLayout();
+            setupDragAndDrop();
+        });
+        
+        function setupDragAndDrop() {
+            const gridContainer = document.getElementById('grid-container');
+            const dragOverlay = document.getElementById('drag-overlay');
+            let isDragging = false;
+            
+            // Prevent default to allow drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                gridContainer.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            // Handle drag enter/over
+            gridContainer.addEventListener('dragenter', function(e) {
+                preventDefaults(e);
+                if (!isDragging) {
+                    isDragging = true;
+                    highlight();
+                }
+            });
+            
+            gridContainer.addEventListener('dragover', function(e) {
+                preventDefaults(e);
+                if (!isDragging) {
+                    isDragging = true;
+                    highlight();
+                }
+            });
+            
+            // Handle drag leave/drop
+            document.addEventListener('dragleave', function(e) {
+                preventDefaults(e);
+                // Only unhighlight if we're leaving the window
+                if (e.clientX <= 0 || e.clientY <= 0 || 
+                    e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+                    isDragging = false;
+                    unhighlight();
+                }
+            });
+            
+            gridContainer.addEventListener('drop', function(e) {
+                preventDefaults(e);
+                isDragging = false;
+                unhighlight();
+                handleDrop(e);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function highlight() {
+                dragOverlay.style.display = 'flex';
+            }
+            
+            function unhighlight() {
+                dragOverlay.style.display = 'none';
+            }
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                handleFiles(files);
+            }
+            
+            function handleFiles(files) {
+                if (files.length === 0) return;
+                
+                for (let i = 0; i < files.length; i++) {
+                    if (files[i].type.startsWith('video/')) {
+                        videoFiles.push(files[i]);
+                    }
+                }
+                
+                // Update the grid with the new videos
+                updateGridLayout();
+            }
+        }
+        
+        function updateGridLayout() {
+            const columns = parseInt(document.getElementById('grid-layout').value, 10);
+            const videoCount = videoFiles.length;
+            
+            // Calculate rows based on video count and column selection
+            // If there are no videos, we'll show at least one row for placeholders
+            // Always add one extra cell for the "add more" placeholder
+            const rows = videoCount > 0 ? Math.ceil((videoCount + 1) / columns) : 1;
+            
+            currentGrid.rows = rows;
+            currentGrid.cols = columns;
+            
+            const gridContainer = document.getElementById('grid-container');
+            
+            // Clear existing content except the drag overlay
+            const dragOverlay = document.getElementById('drag-overlay');
+            gridContainer.innerHTML = '';
+            gridContainer.appendChild(dragOverlay);
+            
+            // Show empty state if no videos
+            if (videoCount === 0) {
+                const emptyGrid = document.createElement('div');
+                emptyGrid.className = 'empty-grid';
+                emptyGrid.innerHTML = `
+                    <i class="fas fa-plus-circle"></i>
+                    <p>Drop videos here</p>
+                    <p>or</p>
+                    <p class="upload-prompt">Click to browse for videos</p>
+                `;
+                emptyGrid.addEventListener('click', function() {
+                    document.getElementById('file-input').click();
+                });
+                gridContainer.appendChild(emptyGrid);
+            } else {
+                // Configure the grid
+                gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+                
+                // Always show all videos plus one placeholder
+                const totalCells = videoCount + 1;
+                
+                for (let i = 0; i < totalCells; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'video-cell';
+                    cell.dataset.index = i;
+                    
+                    if (i < videoFiles.length) {
+                        addVideoToCell(cell, videoFiles[i], i);
+                    } else {
+                        addPlaceholderToCell(cell);
+                    }
+                    
+                    gridContainer.appendChild(cell);
+                }
+            }
+        }
+        
+        function addVideoToCell(cell, file, index) {
+            const video = document.createElement('video');
+            video.src = URL.createObjectURL(file);
+            video.controls = false;
+            video.preload = 'metadata';
+            
+            // Create delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.innerHTML = '×';
+            deleteBtn.title = 'Remove video';
+            deleteBtn.onclick = function(e) {
+                e.stopPropagation();
+                removeVideo(index);
+            };
+            
+            // Create custom controls
+            const controls = document.createElement('div');
+            controls.className = 'video-controls';
+            
+            // Create timeline
+            const timelineContainer = document.createElement('div');
+            timelineContainer.className = 'timeline-container';
+            
+            const timelineBar = document.createElement('div');
+            timelineBar.className = 'timeline-bar';
+            
+            const timelineProgress = document.createElement('div');
+            timelineProgress.className = 'timeline-progress';
+            
+            const timelineHandle = document.createElement('div');
+            timelineHandle.className = 'timeline-handle';
+            
+            timelineContainer.appendChild(timelineBar);
+            timelineContainer.appendChild(timelineProgress);
+            timelineContainer.appendChild(timelineHandle);
+            
+            // Create buttons container
+            const videoButtons = document.createElement('div');
+            videoButtons.className = 'video-buttons';
+            
+            // Create time display
+            const timeDisplay = document.createElement('div');
+            timeDisplay.className = 'time-display';
+            timeDisplay.textContent = '0:00 / 0:00';
+            
+            const playPauseBtn = document.createElement('button');
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playPauseBtn.onclick = function(e) {
+                e.stopPropagation();
+                if (video.paused) {
+                    video.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    
+                    // If one video is played, check if all videos are now playing
+                    checkAllVideosPlaying();
+                } else {
+                    video.pause();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    
+                    // If one video is paused, update the global play/pause button
+                    const playPauseAllBtn = document.getElementById('play-pause-all');
+                    playPauseAllBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+                    areVideosPlaying = false;
+                }
+            };
+            
+            const muteBtn = document.createElement('button');
+            muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+            muteBtn.onclick = function(e) {
+                e.stopPropagation();
+                if (video.muted) {
+                    video.muted = false;
+                    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    
+                    // Check if all videos are now unmuted
+                    checkAllVideosUnmuted();
+                } else {
+                    video.muted = true;
+                    muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                    
+                    // Update the global mute button
+                    const muteToggleBtn = document.getElementById('mute-toggle');
+                    muteToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i> Unmute';
+                    areVideosMuted = true;
+                }
+            };
+            
+            // Add buttons to container
+            videoButtons.appendChild(playPauseBtn);
+            videoButtons.appendChild(timeDisplay);
+            videoButtons.appendChild(muteBtn);
+            
+            // Add timeline and buttons to controls
+            controls.appendChild(timelineContainer);
+            controls.appendChild(videoButtons);
+            
+            // Timeline interaction
+            timelineContainer.addEventListener('click', function(e) {
+                const rect = timelineContainer.getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                video.currentTime = pos * video.duration;
+            });
+            
+            // Update timeline as video plays
+            video.addEventListener('timeupdate', function() {
+                const progress = (video.currentTime / video.duration) * 100;
+                timelineProgress.style.width = progress + '%';
+                timelineHandle.style.left = progress + '%';
+                
+                // Update time display
+                const currentTime = formatTime(video.currentTime);
+                const duration = formatTime(video.duration);
+                timeDisplay.textContent = `${currentTime} / ${duration}`;
+            });
+            
+            // Format time to mm:ss
+            function formatTime(seconds) {
+                seconds = Math.floor(seconds);
+                const minutes = Math.floor(seconds / 60);
+                seconds = seconds % 60;
+                return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            cell.innerHTML = '';
+            cell.appendChild(video);
+            cell.appendChild(controls);
+            cell.appendChild(deleteBtn);
+            
+            // Toggle play/pause on cell click
+            cell.onclick = function() {
+                if (video.paused) {
+                    video.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    video.pause();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            };
+            
+            // Update button state when video plays/pauses
+            video.addEventListener('play', function() {
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            });
+            
+            video.addEventListener('pause', function() {
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+            
+            // Add listener to automatically rewind when video ends
+            addEndedEventListener(video);
+            
+            // Add listeners for play and pause to update global state
+            video.addEventListener('play', checkAllVideosPlaying);
+            video.addEventListener('pause', checkAllVideosPaused);
+        }
+        
+        function addPlaceholderToCell(cell) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'placeholder';
+            placeholder.innerHTML = `
+                <i class="fas fa-plus-circle"></i>
+                <p>Drop videos here</p>
+                <p>or click to browse</p>
+            `;
+            
+            cell.innerHTML = '';
+            cell.appendChild(placeholder);
+            
+            // Add click handler to cell to trigger file selection
+            cell.onclick = function() {
+                document.getElementById('file-input').click();
+            };
+            
+            // Add drag and drop to individual placeholders
+            let isDraggingOver = false;
+            
+            cell.addEventListener('dragenter', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!isDraggingOver) {
+                    isDraggingOver = true;
+                    placeholder.classList.add('drag-over');
+                }
+            });
+            
+            cell.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!isDraggingOver) {
+                    isDraggingOver = true;
+                    placeholder.classList.add('drag-over');
+                }
+            });
+            
+            cell.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Only remove highlight if we're actually leaving the cell
+                // Check if the mouse is outside the cell boundaries
+                const rect = cell.getBoundingClientRect();
+                const x = e.clientX;
+                const y = e.clientY;
+                
+                if (x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) {
+                    isDraggingOver = false;
+                    placeholder.classList.remove('drag-over');
+                }
+            });
+            
+            cell.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                isDraggingOver = false;
+                placeholder.classList.remove('drag-over');
+                
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                for (let i = 0; i < files.length; i++) {
+                    if (files[i].type.startsWith('video/')) {
+                        videoFiles.push(files[i]);
+                    }
+                }
+                
+                // Update the grid with the new videos
+                updateGridLayout();
+            });
+        }
+        
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+            
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].type.startsWith('video/')) {
+                    videoFiles.push(files[i]);
+                }
+            }
+            
+            // Clear the file input so the same file can be selected again if needed
+            event.target.value = null;
+            
+            // Update the grid with the new videos
+            updateGridLayout();
+        }
+        
+        function togglePlayPauseAll() {
+            const playPauseBtn = document.getElementById('play-pause-all');
+            const videos = document.querySelectorAll('.video-cell video');
+            
+            if (areVideosPlaying) {
+                // If videos are currently playing, pause them
+                videos.forEach(video => {
+                    video.pause();
+                    
+                    // Update the individual control button display
+                    const controls = video.nextElementSibling;
+                    if (controls && controls.firstChild) {
+                        controls.firstChild.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                });
+                
+                // Update the global play/pause button
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+                areVideosPlaying = false;
+            } else {
+                // If videos are currently paused, play them
+                videos.forEach(video => {
+                    const playPromise = video.play();
+                    
+                    // Handle the play promise to avoid uncaught errors
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log('Auto-play was prevented: ', error);
+                        });
+                    }
+                    
+                    // Update the individual control button display
+                    const controls = video.nextElementSibling;
+                    if (controls && controls.firstChild) {
+                        controls.firstChild.innerHTML = '<i class="fas fa-pause"></i>';
+                    }
+                });
+                
+                // Update the global play/pause button
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                areVideosPlaying = true;
+            }
+        }
+        
+        // These functions are kept for backward compatibility or internal use
+        function playAllVideos() {
+            areVideosPlaying = true;
+            const playPauseBtn = document.getElementById('play-pause-all');
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause All';
+            
+            const videos = document.querySelectorAll('.video-cell video');
+            videos.forEach(video => {
+                const playPromise = video.play();
+                
+                // Handle the play promise to avoid uncaught errors
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log('Auto-play was prevented: ', error);
+                    });
+                }
+                
+                // Update the control button display
+                const controls = video.nextElementSibling;
+                if (controls && controls.firstChild) {
+                    controls.firstChild.innerHTML = '<i class="fas fa-pause"></i>';
+                }
+            });
+        }
+        
+        function pauseAllVideos() {
+            areVideosPlaying = false;
+            const playPauseBtn = document.getElementById('play-pause-all');
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play All';
+            
+            const videos = document.querySelectorAll('.video-cell video');
+            videos.forEach(video => {
+                video.pause();
+                
+                // Update the control button display
+                const controls = video.nextElementSibling;
+                if (controls && controls.firstChild) {
+                    controls.firstChild.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+        }
+        
+        function rewindAllVideos() {
+            const videos = document.querySelectorAll('.video-cell video');
+            videos.forEach(video => {
+                video.currentTime = 0;
+            });
+            
+            // Update global play state button if all videos were rewound while playing
+            if (areVideosPlaying) {
+                // If videos were playing, they still are, but we update the UI to be consistent
+                const playPauseAllBtn = document.getElementById('play-pause-all');
+                playPauseAllBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            }
+        }
+        
+        function toggleMuteAll() {
+            const muteToggleBtn = document.getElementById('mute-toggle');
+            const videos = document.querySelectorAll('.video-cell video');
+            
+            if (areVideosMuted) {
+                // Unmute all videos
+                videos.forEach(video => {
+                    video.muted = false;
+                    
+                    // Update the individual control button display
+                    const controls = video.nextElementSibling;
+                    if (controls && controls.children[1]) {
+                        controls.children[1].innerHTML = '<i class="fas fa-volume-up"></i>';
+                    }
+                });
+                
+                // Update the global mute button
+                muteToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i> Mute';
+                areVideosMuted = false;
+            } else {
+                // Mute all videos
+                videos.forEach(video => {
+                    video.muted = true;
+                    
+                    // Update the individual control button display
+                    const controls = video.nextElementSibling;
+                    if (controls && controls.children[1]) {
+                        controls.children[1].innerHTML = '<i class="fas fa-volume-mute"></i>';
+                    }
+                });
+                
+                // Update the global mute button
+                muteToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i> Unmute';
+                areVideosMuted = true;
+            }
+        }
+        
+        // These functions are kept for backward compatibility or internal use
+        function muteAllVideos() {
+            areVideosMuted = true;
+            const muteToggleBtn = document.getElementById('mute-toggle');
+                            muteToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i> Unmute';
+            
+            const videos = document.querySelectorAll('.video-cell video');
+            videos.forEach(video => {
+                video.muted = true;
+                
+                // Update the control button display
+                const controls = video.nextElementSibling;
+                if (controls && controls.children[1]) {
+                    controls.children[1].innerHTML = '<i class="fas fa-volume-mute"></i>';
+                }
+            });
+        }
+        
+        function unmuteAllVideos() {
+            areVideosMuted = false;
+            const muteToggleBtn = document.getElementById('mute-toggle');
+            muteToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i> Mute';
+            
+            const videos = document.querySelectorAll('.video-cell video');
+            videos.forEach(video => {
+                video.muted = false;
+                
+                // Update the control button display
+                const controls = video.nextElementSibling;
+                if (controls && controls.children[1]) {
+                    controls.children[1].innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            });
+        }
+        
+        function syncAllVideos() {
+            const videos = document.querySelectorAll('.video-cell video');
+            if (videos.length === 0) return;
+            
+            // Find the video with the maximum current time
+            let maxTime = 0;
+            videos.forEach(video => {
+                if (video.currentTime > maxTime) {
+                    maxTime = video.currentTime;
+                }
+            });
+            
+            // Sync all videos to this time
+            videos.forEach(video => {
+                video.currentTime = maxTime;
+            });
+        }
+        
+        function resetGrid() {
+            videoFiles = [];
+            updateGridLayout();
+        }
+        
+        // Function to remove a video
+        function removeVideo(index) {
+            // Remove the video file from the array
+            videoFiles.splice(index, 1);
+            
+            // Update the grid
+            updateGridLayout();
+            
+            // Check if we should update the global play state
+            if (videoFiles.length === 0) {
+                // If no videos are left, make sure the play button shows Play All
+                const playPauseAllBtn = document.getElementById('play-pause-all');
+                                    playPauseAllBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+                areVideosPlaying = false;
+            } else {
+                // Otherwise check the current state of the remaining videos
+                checkAllVideosPlaying();
+                checkAllVideosPaused();
+            }
+        }
+        
+        // Helper functions to check if all videos are playing/paused/muted/unmuted
+        function checkAllVideosPlaying() {
+            const videos = document.querySelectorAll('.video-cell video');
+            const allPlaying = Array.from(videos).every(video => !video.paused);
+            
+            const playPauseAllBtn = document.getElementById('play-pause-all');
+            if (allPlaying && videos.length > 0) {
+                playPauseAllBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                areVideosPlaying = true;
+            }
+        }
+        
+        function checkAllVideosPaused() {
+            const videos = document.querySelectorAll('.video-cell video');
+            const anyPaused = Array.from(videos).some(video => video.paused);
+            
+            const playPauseAllBtn = document.getElementById('play-pause-all');
+            if (anyPaused) {
+                playPauseAllBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+                areVideosPlaying = false;
+            }
+        }
+        
+        function checkAllVideosUnmuted() {
+            const videos = document.querySelectorAll('.video-cell video');
+            const allUnmuted = Array.from(videos).every(video => !video.muted);
+            
+            const muteToggleBtn = document.getElementById('mute-toggle');
+            if (allUnmuted && videos.length > 0) {
+                muteToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i> Mute';
+                areVideosMuted = false;
+            }
+        }
+        
+        // Add event listener to automatically rewind videos when they end
+        function addEndedEventListener(video) {
+            video.addEventListener('ended', function() {
+                this.currentTime = 0;
+                
+                // Update the control button display
+                const controls = this.nextElementSibling;
+                if (controls && controls.firstChild) {
+                    controls.firstChild.innerHTML = '<i class="fas fa-play"></i>';
+                }
+                
+                // Update global play state
+                checkAllVideosPaused();
+            });
+        }
+    </script>
+<div style="display: flex; justify-content: center; margin-top: 20px; padding-bottom: 20px;">
+<div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; padding-bottom: 20px;">
+<div style="position: fixed; bottom: 0; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; background-color: #1e1e1e; padding: 10px 0;">
+<a href="/" style="text-decoration: none;" target="_blank">
+<a href="https://cammrowland.com" style="text-decoration: none;" target="_blank">
+<img alt="Bottom Centered Image" onmouseout="this.style.opacity=0.5;" onmouseover="this.style.opacity=1;" src="https://media.discordapp.net/attachments/1048080832742555648/1347760687698673796/Asset_5.png?ex=67ccff74&amp;is=67cbadf4&amp;hm=22e29ffe3be18ee09e894885793e33b615e848d10449fc2293ad8c6f1cc8d6cc&amp;=&amp;format=webp&amp;quality=lossless" style="max-width: 100px; height: auto; opacity: 0.5; transition: opacity 0.3s;"/>
+</a>
+</a>
+<p style="text-align: center; font-size: 10px; color: #888; margin-top: 5px;">Created for my workflow, maybe yours too ✌️</p>
+</div>
+</div>
+</div>
+</body>
+</html>
