@@ -53,6 +53,27 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 10px;
+            padding: 10px;
+            z-index: 1000;
+            background-color: #1e1e1e;
+            transition: all 0.3s ease;
+        }
+        
+        .control-row.sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 0;
+            max-width: 100%;
+        }
+        
+        .control-row-placeholder {
+            display: none;
+            height: 0;
+            transition: height 0.3s ease;
         }
         
         .controls {
@@ -112,10 +133,11 @@
         .grid-container {
             display: grid;
             gap: 10px;
-            min-height: 500px;
+            min-height: 400px;
             border: none;
-            background-color: #121212;
+            background-color: #1e1e1e;
             position: relative;
+            margin-bottom: 20px;
         }
         
         .empty-grid {
@@ -129,15 +151,16 @@
             top: 0;
             left: 0;
             z-index: 5;
-            color: #888;
+            color: #666;
             text-align: center;
             padding: 20px;
+            background-color: #2a2a2a;
         }
         
         .empty-grid i {
             font-size: 48px;
             margin-bottom: 20px;
-            color: #555;
+            color: #007BFF;
         }
         
         .empty-grid p {
@@ -181,14 +204,39 @@
             background-color: #2a2a2a;
             position: relative;
             overflow: hidden;
-            aspect-ratio: 16 / 9;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
         }
         
         .video-cell video {
             width: 100%;
             height: 100%;
-            object-fit: contain;
             background-color: #000;
+            object-fit: contain;
+        }
+        
+        .filename-display {
+            width: 100%;
+            color: #888888;
+            background-color: #2a2a2a;
+            text-align: center;
+            font-size: 11px;
+            padding: 4px;
+            box-sizing: border-box;
+            word-break: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-top: 1px solid #444;
+        }
+        
+        .filename-overlay {
+            display: none; /* Hide the existing overlay */
         }
         
         .video-controls {
@@ -341,74 +389,14 @@
         }
         
         .file-label {
-            font-family: 'Roboto', sans-serif; /* Match button font */
-            font-size: 14px; /* Match other buttons */
-            padding: 8px 16px; /* Ensure padding is the same */
-            height: 40px; /* Explicit height match */
-            line-height: normal; /* Prevent stretching */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box; /* Ensure consistent box model */
-            border-radius: 4px; /* Match button shape */
-            border: none;
-            background-color: #007BFF; /* Match other button colors */
-            color: white;
-            font-weight: 400; /* Ensure text weight matches */
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .file-label:hover {
-            background-color: #0056b3; /* Match hover effect */
-        }
-            font-size: 14px; /* Match other buttons */
-            padding: 8px 16px; /* Ensure padding is the same */
-            height: 40px; /* Explicit height match */
-            line-height: normal; /* Prevent stretching */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box; /* Ensure consistent box model */
-            border-radius: 4px; /* Match button shape */
-            border: none;
-            background-color: #007BFF; /* Match other button colors */
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .file-label:hover {
-            background-color: #0056b3; /* Match hover effect */
-        }
-            font-size: 14px; /* Match other buttons */
-            padding: 8px 16px; /* Ensure padding is the same */
-            height: 40px; /* Explicit height match */
-            line-height: normal; /* Prevent stretching */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box; /* Ensure consistent box model */
-        }
-    font-size: 14px; /* Match other buttons */
-    padding: 6px 16px;
-    height: 40px;
-    line-height: 28px;
-    display: flex;
-    align-items: center;
-    font-size: 14px; /* Match other buttons */
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    font-size: 14px; /* Match other buttons */
-    height: 40px; /* Ensuring uniform height across all controls */ /* Match the height of select dropdown */
+            font-family: 'Roboto', sans-serif;
+            height: 40px;
             display: inline-block;
             background-color: #007BFF;
             color: #f0f0f0;
             padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
-            height: 40px; /* Ensuring uniform height across all controls */
             display: flex;
             align-items: center;
             gap: 6px;
@@ -418,13 +406,49 @@
             background-color: #006FCE;
         }
         
+        .privacy-info {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 10px;
+            color: #007BFF;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .info-icon {
+            font-size: 16px;
+        }
+        
+        .info-tooltip {
+            position: absolute;
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+            padding: 10px 15px;
+            border-radius: 4px;
+            width: 280px;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            font-size: 12px;
+            line-height: 1.4;
+            display: none;
+            text-align: left;
+            border: 1px solid #444;
+        }
+        
+        .privacy-info:hover .info-tooltip {
+            display: block;
+        }
+        
         select {
             background-color: #2a2a2a;
             color: #f0f0f0;
             padding: 8px 16px;
             border-radius: 4px;
             border: 1px solid #444;
-            height: 40px; /* Ensuring uniform height across all controls */ /* Match the height of buttons */
+            height: 40px;
             font-family: 'Roboto', sans-serif;
         }
         
@@ -446,7 +470,7 @@
                 justify-content: center;
             }
         }
-    </style>
+</style>
 </head>
 <body>
 <div class="container">
@@ -454,18 +478,26 @@
 <a href="https://cammrowland.com" style="text-decoration: none;">
 <img alt="Miltiplay Logo" src="https://media.discordapp.net/attachments/1048080832742555648/1347773001915039845/Asset_2.png?ex=67cd0aec&amp;is=67cbb96c&amp;hm=9d821ecaf3b9f5a930174cad494ca2f284c382b4ca8e3d7757466d9d86436cbd&amp;=&amp;format=webp&amp;quality=lossless" style="max-width: 200px; height: auto;"/>
 </a>
-<span class="subtitle">Compare Versions. Side by Side.</span>
+<span class="subtitle">Compare Versions. Side by Side. Never Uploaded.</span>
 </header>
-<div class="control-row">
+<div class="control-row" id="control-row">
 <div class="left-controls">
 <label class="file-label" for="file-input"><i class="fas fa-plus-circle" style="margin-right: 6px;"></i> Add Videos</label>
 <input accept="video/*" class="file-input" id="file-input" multiple="" onchange="handleFileSelect(event)" type="file"/>
+<div class="privacy-info">
+  <i class="fas fa-info-circle info-icon"></i>
+  <div class="info-tooltip">
+    <strong>How does Miltiplay work?</strong><br>
+    Videos play directly in your browser and are never uploaded to any server. All content stays on your device - privacy first!
+  </div>
+</div>
 </div>
 <div class="center-controls">
 <button id="play-pause-all" onclick="togglePlayPauseAll()"><i class="fas fa-play"></i> Play</button>
 <button id="rewind-all" onclick="rewindAllVideos()"><i class="fas fa-undo"></i> Rewind</button>
 <button id="mute-toggle" onclick="toggleMuteAll()"><i class="fas fa-volume-up"></i> Mute</button>
 <button id="sync-all" onclick="syncAllVideos()"><i class="fas fa-sync"></i> Sync</button>
+<button id="toggle-filenames" onclick="toggleFilenames()"><i class="fas fa-eye"></i> Filenames</button>
 <button id="reset-all" onclick="resetGrid()"><i class="fas fa-trash"></i> Reset</button>
 </div>
 <div class="right-controls">
@@ -477,6 +509,7 @@
 </select>
 </div>
 </div>
+<div class="control-row-placeholder" id="control-row-placeholder"></div>
 <div class="grid-container" id="grid-container">
 <div class="drag-overlay" id="drag-overlay">
 <i class="fas fa-file-upload"></i>
@@ -491,12 +524,40 @@
         // Global flags to track video states
         let areVideosPlaying = false;
         let areVideosMuted = false;
+        let areFilenamesVisible = true; // Track filename visibility
         
         // Initialize the grid on page load and set up drag and drop events
         document.addEventListener('DOMContentLoaded', function() {
             updateGridLayout();
             setupDragAndDrop();
+            setupStickyControls();
         });
+        
+        // Setup sticky controls that remain visible when scrolling
+        function setupStickyControls() {
+            const controlRow = document.getElementById('control-row');
+            const placeholder = document.getElementById('control-row-placeholder');
+            const controlRowHeight = controlRow.offsetHeight;
+            const controlRowOffset = controlRow.offsetTop;
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > controlRowOffset) {
+                    // Make controls sticky when scrolled past
+                    if (!controlRow.classList.contains('sticky')) {
+                        controlRow.classList.add('sticky');
+                        placeholder.style.display = 'block';
+                        placeholder.style.height = controlRowHeight + 'px';
+                    }
+                } else {
+                    // Return to normal positioning
+                    if (controlRow.classList.contains('sticky')) {
+                        controlRow.classList.remove('sticky');
+                        placeholder.style.display = 'none';
+                        placeholder.style.height = '0';
+                    }
+                }
+            });
+        }
         
         function setupDragAndDrop() {
             const gridContainer = document.getElementById('grid-container');
@@ -759,8 +820,23 @@
             }
             
             cell.innerHTML = '';
-            cell.appendChild(video);
-            cell.appendChild(controls);
+            
+            // Create a wrapper for the video and its controls
+            const videoWrapper = document.createElement('div');
+            videoWrapper.className = 'video-wrapper';
+            
+            videoWrapper.appendChild(video);
+            videoWrapper.appendChild(controls);
+            
+            // Add video wrapper to cell
+            cell.appendChild(videoWrapper);
+            
+            // Create filename display below video
+            const filenameDisplay = document.createElement('div');
+            filenameDisplay.className = 'filename-display';
+            filenameDisplay.textContent = file.name;
+            cell.appendChild(filenameDisplay);
+            
             cell.appendChild(deleteBtn);
             
             // Toggle play/pause on cell click
@@ -891,9 +967,9 @@
                     video.pause();
                     
                     // Update the individual control button display
-                    const controls = video.nextElementSibling;
-                    if (controls && controls.firstChild) {
-                        controls.firstChild.innerHTML = '<i class="fas fa-play"></i>';
+                    const controls = video.parentElement.querySelector('.video-controls');
+                    if (controls && controls.querySelector('.video-buttons button')) {
+                        controls.querySelector('.video-buttons button').innerHTML = '<i class="fas fa-play"></i>';
                     }
                 });
                 
@@ -913,9 +989,9 @@
                     }
                     
                     // Update the individual control button display
-                    const controls = video.nextElementSibling;
-                    if (controls && controls.firstChild) {
-                        controls.firstChild.innerHTML = '<i class="fas fa-pause"></i>';
+                    const controls = video.parentElement.querySelector('.video-controls');
+                    if (controls && controls.querySelector('.video-buttons button')) {
+                        controls.querySelector('.video-buttons button').innerHTML = '<i class="fas fa-pause"></i>';
                     }
                 });
                 
@@ -943,9 +1019,9 @@
                 }
                 
                 // Update the control button display
-                const controls = video.nextElementSibling;
-                if (controls && controls.firstChild) {
-                    controls.firstChild.innerHTML = '<i class="fas fa-pause"></i>';
+                const controls = video.parentElement.querySelector('.video-controls');
+                if (controls && controls.querySelector('.video-buttons button')) {
+                    controls.querySelector('.video-buttons button').innerHTML = '<i class="fas fa-pause"></i>';
                 }
             });
         }
@@ -960,9 +1036,9 @@
                 video.pause();
                 
                 // Update the control button display
-                const controls = video.nextElementSibling;
-                if (controls && controls.firstChild) {
-                    controls.firstChild.innerHTML = '<i class="fas fa-play"></i>';
+                const controls = video.parentElement.querySelector('.video-controls');
+                if (controls && controls.querySelector('.video-buttons button')) {
+                    controls.querySelector('.video-buttons button').innerHTML = '<i class="fas fa-play"></i>';
                 }
             });
         }
@@ -991,9 +1067,9 @@
                     video.muted = false;
                     
                     // Update the individual control button display
-                    const controls = video.nextElementSibling;
-                    if (controls && controls.children[1]) {
-                        controls.children[1].innerHTML = '<i class="fas fa-volume-up"></i>';
+                    const controls = video.parentElement.querySelector('.video-controls');
+                    if (controls && controls.querySelector('.video-buttons button:last-child')) {
+                        controls.querySelector('.video-buttons button:last-child').innerHTML = '<i class="fas fa-volume-up"></i>';
                     }
                 });
                 
@@ -1006,9 +1082,9 @@
                     video.muted = true;
                     
                     // Update the individual control button display
-                    const controls = video.nextElementSibling;
-                    if (controls && controls.children[1]) {
-                        controls.children[1].innerHTML = '<i class="fas fa-volume-mute"></i>';
+                    const controls = video.parentElement.querySelector('.video-controls');
+                    if (controls && controls.querySelector('.video-buttons button:last-child')) {
+                        controls.querySelector('.video-buttons button:last-child').innerHTML = '<i class="fas fa-volume-mute"></i>';
                     }
                 });
                 
@@ -1029,9 +1105,9 @@
                 video.muted = true;
                 
                 // Update the control button display
-                const controls = video.nextElementSibling;
-                if (controls && controls.children[1]) {
-                    controls.children[1].innerHTML = '<i class="fas fa-volume-mute"></i>';
+                const controls = video.parentElement.querySelector('.video-controls');
+                if (controls && controls.querySelector('.video-buttons button:last-child')) {
+                    controls.querySelector('.video-buttons button:last-child').innerHTML = '<i class="fas fa-volume-mute"></i>';
                 }
             });
         }
@@ -1046,9 +1122,9 @@
                 video.muted = false;
                 
                 // Update the control button display
-                const controls = video.nextElementSibling;
-                if (controls && controls.children[1]) {
-                    controls.children[1].innerHTML = '<i class="fas fa-volume-up"></i>';
+                const controls = video.parentElement.querySelector('.video-controls');
+                if (controls && controls.querySelector('.video-buttons button:last-child')) {
+                    controls.querySelector('.video-buttons button:last-child').innerHTML = '<i class="fas fa-volume-up"></i>';
                 }
             });
         }
@@ -1074,6 +1150,11 @@
         function resetGrid() {
             videoFiles = [];
             updateGridLayout();
+            
+            // Reset play/pause button state
+            const playPauseAllBtn = document.getElementById('play-pause-all');
+            playPauseAllBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+            areVideosPlaying = false;
         }
         
         // Function to remove a video
@@ -1137,26 +1218,44 @@
                 this.currentTime = 0;
                 
                 // Update the control button display
-                const controls = this.nextElementSibling;
-                if (controls && controls.firstChild) {
-                    controls.firstChild.innerHTML = '<i class="fas fa-play"></i>';
+                const controls = this.parentElement.querySelector('.video-controls');
+                if (controls && controls.querySelector('.video-buttons button')) {
+                    controls.querySelector('.video-buttons button').innerHTML = '<i class="fas fa-play"></i>';
                 }
                 
                 // Update global play state
                 checkAllVideosPaused();
             });
         }
+        
+        // Function to toggle filename visibility
+        function toggleFilenames() {
+            const filenameBtn = document.getElementById('toggle-filenames');
+            const filenameDisplays = document.querySelectorAll('.filename-display');
+            
+            if (areFilenamesVisible) {
+                // Hide filenames
+                filenameDisplays.forEach(display => {
+                    display.style.display = 'none';
+                });
+                filenameBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Filenames';
+                areFilenamesVisible = false;
+            } else {
+                // Show filenames
+                filenameDisplays.forEach(display => {
+                    display.style.display = 'block';
+                });
+                filenameBtn.innerHTML = '<i class="fas fa-eye"></i> Filenames';
+                areFilenamesVisible = true;
+            }
+        }
     </script>
-<div style="display: flex; justify-content: center; margin-top: 20px; padding-bottom: 20px;">
-<div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; padding-bottom: 20px;">
-<div style="position: fixed; bottom: 0; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; background-color: #1e1e1e; padding: 10px 0;">
-<a href="/" style="text-decoration: none;" target="_blank">
+<div style="display: flex; justify-content: center; margin-top: 40px; padding-bottom: 20px;">
+<div style="display: flex; flex-direction: column; align-items: center;">
 <a href="https://cammrowland.com" style="text-decoration: none;" target="_blank">
-<img alt="Bottom Centered Image" onmouseout="this.style.opacity=0.5;" onmouseover="this.style.opacity=1;" src="https://media.discordapp.net/attachments/1048080832742555648/1347760687698673796/Asset_5.png?ex=67ccff74&amp;is=67cbadf4&amp;hm=22e29ffe3be18ee09e894885793e33b615e848d10449fc2293ad8c6f1cc8d6cc&amp;=&amp;format=webp&amp;quality=lossless" style="max-width: 100px; height: auto; opacity: 0.5; transition: opacity 0.3s;"/>
+<img alt="Footer Image" onmouseout="this.style.opacity=0.5;" onmouseover="this.style.opacity=1;" src="https://media.discordapp.net/attachments/1048080832742555648/1347760687698673796/Asset_5.png?ex=67ccff74&amp;is=67cbadf4&amp;hm=22e29ffe3be18ee09e894885793e33b615e848d10449fc2293ad8c6f1cc8d6cc&amp;=&amp;format=webp&amp;quality=lossless" style="max-width: 100px; height: auto; opacity: 0.5; transition: opacity 0.3s;"/>
 </a>
-</a>
-<p style="text-align: center; font-size: 10px; color: #888; margin-top: 5px;">Created for my workflow, maybe yours too ✌️</p>
-</div>
+<p style="text-align: center; font-size: 10px; color: #888; margin-top: 5px;">©2025 Camm Rowland • Created for my workflow, maybe yours too ✌️</p>
 </div>
 </div>
 </body>
