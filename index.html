@@ -440,7 +440,7 @@
             color: #f0f0f0;
             padding: 10px 15px;
             border-radius: 4px;
-            width: 280px;
+            width: 320px;
             top: 25px;
             left: 50%;
             transform: translateX(-50%);
@@ -453,7 +453,7 @@
             border: 1px solid #444;
         }
         
-        .privacy-info:hover .info-tooltip {
+        .info-tooltip.visible {
             display: block;
         }
         
@@ -491,7 +491,7 @@
 <div class="container">
 <header>
 <a href="javascript:void(0);" onclick="resetGrid();" style="text-decoration: none; cursor: pointer;">
-<img alt="Miltiplay Logo" src="https://media.discordapp.net/attachments/1048080832742555648/1347773001915039845/Asset_2.png?ex=67cd0aec&amp;is=67cbb96c&amp;hm=9d821ecaf3b9f5a930174cad494ca2f284c382b4ca8e3d7757466d9d86436cbd&amp;=&amp;format=webp&amp;quality=lossless" style="max-width: 200px; height: auto;"/>
+<img alt="Multiplay Logo" src="multiplay-logo.png" style="max-width: 200px; height: auto;"/>
 </a>
 <span class="subtitle">Compare Versions. Side by Side. Never Uploaded.</span>
 </header>
@@ -500,10 +500,10 @@
 <label class="file-label" for="file-input"><i class="fas fa-plus-circle" style="margin-right: 6px;"></i> Add Videos</label>
 <input accept="video/*" class="file-input" id="file-input" multiple="" onchange="handleFileSelect(event)" type="file"/>
 <div class="privacy-info">
-  <i class="fas fa-info-circle info-icon"></i>
+  <i class="fas fa-info-circle info-icon" onclick="toggleInfoTooltip(this)"></i>
   <div class="info-tooltip">
-    <strong>How does Miltiplay work?</strong><br>
-    Videos play directly in your browser and are never uploaded to any server. All content stays on your device - privacy first!
+    <strong>How does Multiplay work?</strong><br>
+    Videos play directly in your browser and are never uploaded to any server. All content stays on your device.
   </div>
 </div>
 </div>
@@ -540,6 +540,36 @@
         let areVideosPlaying = false;
         let areVideosMuted = false;
         let areFilenamesVisible = true; // Track filename visibility
+        
+        // Function to toggle info tooltip visibility
+        function toggleInfoTooltip(element) {
+            const tooltip = element.nextElementSibling;
+            
+            // Hide any other visible tooltips
+            document.querySelectorAll('.info-tooltip.visible').forEach(tip => {
+                if (tip !== tooltip) {
+                    tip.classList.remove('visible');
+                }
+            });
+            
+            // Toggle visibility of the clicked element's tooltip
+            tooltip.classList.toggle('visible');
+            
+            // Close tooltip when clicking elsewhere
+            setTimeout(() => {
+                const closeTooltip = function(e) {
+                    if (!element.contains(e.target) && !tooltip.contains(e.target)) {
+                        tooltip.classList.remove('visible');
+                        document.removeEventListener('click', closeTooltip);
+                    }
+                };
+                
+                document.addEventListener('click', closeTooltip);
+            }, 10);
+            
+            // Prevent event from bubbling up
+            event.stopPropagation();
+        }
         
         // Initialize the grid on page load and set up drag and drop events
         document.addEventListener('DOMContentLoaded', function() {
@@ -1268,7 +1298,7 @@
 <div style="display: flex; justify-content: center; margin-top: 40px; padding-bottom: 20px;">
 <div style="display: flex; flex-direction: column; align-items: center;">
 <a href="https://cammrowland.com" style="text-decoration: none;" target="_blank">
-<img alt="Footer Image" onmouseout="this.style.opacity=0.5;" onmouseover="this.style.opacity=1;" src="https://media.discordapp.net/attachments/1048080832742555648/1347760687698673796/Asset_5.png?ex=67ccff74&amp;is=67cbadf4&amp;hm=22e29ffe3be18ee09e894885793e33b615e848d10449fc2293ad8c6f1cc8d6cc&amp;=&amp;format=webp&amp;quality=lossless" style="max-width: 100px; height: auto; opacity: 0.5; transition: opacity 0.3s;"/>
+<img alt="Footer Image" onmouseout="this.style.opacity=0.5;" onmouseover="this.style.opacity=1;" src="camm-rowland-logo.png" style="max-width: 100px; height: auto; opacity: 0.5; transition: opacity 0.3s;"/>
 </a>
 <p style="text-align: center; font-size: 10px; color: #888; margin-top: 5px;">©2025 Camm Rowland • Created for my workflow, maybe yours too ✌️</p>
 </div>
