@@ -138,6 +138,8 @@
             background-color: #1e1e1e;
             position: relative;
             margin-bottom: 20px;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         
         .empty-grid {
@@ -150,11 +152,14 @@
             position: absolute;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
             z-index: 5;
             color: #666;
             text-align: center;
             padding: 20px;
             background-color: #2a2a2a;
+            box-sizing: border-box;
         }
         
         .empty-grid i {
@@ -233,6 +238,16 @@
             overflow: hidden;
             text-overflow: ellipsis;
             border-top: 1px solid #444;
+            transition: all 0.3s ease;
+            max-height: 30px;
+            opacity: 1;
+        }
+        
+        .filename-display.hidden {
+            max-height: 0;
+            padding: 0;
+            opacity: 0;
+            border-top-color: transparent;
         }
         
         .filename-overlay {
@@ -475,7 +490,7 @@
 <body>
 <div class="container">
 <header>
-<a href="https://cammrowland.com" style="text-decoration: none;">
+<a href="javascript:void(0);" onclick="resetGrid();" style="text-decoration: none; cursor: pointer;">
 <img alt="Miltiplay Logo" src="https://media.discordapp.net/attachments/1048080832742555648/1347773001915039845/Asset_2.png?ex=67cd0aec&amp;is=67cbb96c&amp;hm=9d821ecaf3b9f5a930174cad494ca2f284c382b4ca8e3d7757466d9d86436cbd&amp;=&amp;format=webp&amp;quality=lossless" style="max-width: 200px; height: auto;"/>
 </a>
 <span class="subtitle">Compare Versions. Side by Side. Never Uploaded.</span>
@@ -831,9 +846,9 @@
             // Add video wrapper to cell
             cell.appendChild(videoWrapper);
             
-            // Create filename display below video
+            // Create filename display below video with appropriate initial state
             const filenameDisplay = document.createElement('div');
-            filenameDisplay.className = 'filename-display';
+            filenameDisplay.className = areFilenamesVisible ? 'filename-display' : 'filename-display hidden';
             filenameDisplay.textContent = file.name;
             cell.appendChild(filenameDisplay);
             
@@ -1236,14 +1251,14 @@
             if (areFilenamesVisible) {
                 // Hide filenames
                 filenameDisplays.forEach(display => {
-                    display.style.display = 'none';
+                    display.classList.add('hidden');
                 });
                 filenameBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Filenames';
                 areFilenamesVisible = false;
             } else {
                 // Show filenames
                 filenameDisplays.forEach(display => {
-                    display.style.display = 'block';
+                    display.classList.remove('hidden');
                 });
                 filenameBtn.innerHTML = '<i class="fas fa-eye"></i> Filenames';
                 areFilenamesVisible = true;
