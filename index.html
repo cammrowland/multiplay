@@ -68,6 +68,18 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             margin-bottom: 0;
             max-width: 100%;
+            animation: slideDownFade 0.3s ease-out;
+        }
+        
+        @keyframes slideDownFade {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .control-row.animate-shadow-on-scroll {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateY(0);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
         }
         
         .control-row-placeholder {
@@ -126,8 +138,17 @@
         }
         
         button:disabled {
-            background-color: #cccccc;
+            background-color: #555555;
             cursor: not-allowed;
+            opacity: 0.5;
+            box-shadow: none;
+            transform: none;
+        }
+        
+        button:disabled:hover {
+            background-color: #555555;
+            box-shadow: none;
+            transform: none;
         }
         
         .grid-container {
@@ -467,6 +488,121 @@
             font-family: 'Roboto', sans-serif;
         }
         
+        /* Animation styles */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .animate-fade-in {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-scale-in {
+            opacity: 0;
+            animation: scaleIn 0.5s ease-out forwards;
+        }
+        
+        .animate-slide-in {
+            opacity: 0;
+            animation: slideInRight 0.5s ease-out forwards;
+        }
+        
+        /* Add animation delay classes */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        
+        /* Add transition to interactive elements */
+        button, .file-label, select {
+            transition: all 0.2s ease-out;
+        }
+        
+        button:hover, .file-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:active, .file-label:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Pulse animation for empty grid */
+        @keyframes pulse {
+            0% { background-color: #2a2a2a; }
+            50% { background-color: #323232; }
+            100% { background-color: #2a2a2a; }
+        }
+        
+        .empty-grid {
+            animation: pulse 3s infinite ease-in-out;
+        }
+        
+        /* Mobile warning styles */
+        .mobile-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            display: none; /* Hidden by default */
+        }
+        
+        .mobile-warning h2 {
+            margin-bottom: 20px;
+            color: #ff9800;
+        }
+        
+        .mobile-warning p {
+            margin-bottom: 16px;
+            font-size: 16px;
+            max-width: 600px;
+        }
+        
+        .mobile-warning i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ff9800;
+        }
+        
+        .mobile-button {
+            background-color: #ff9800;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .mobile-button:hover {
+            background-color: #ffb74d;
+        }
+        
         @media (max-width: 1100px) {
             .control-row {
                 flex-direction: column;
@@ -489,6 +625,13 @@
 </head>
 <body>
 <div class="container">
+<div id="mobile-warning" class="mobile-warning">
+    <i class="fas fa-desktop"></i>
+    <h2>Desktop Site Recommended</h2>
+    <p>Multiplay is designed to compare videos side-by-side, which works best on a laptop or desktop computer.</p>
+    <p>The experience on mobile devices may be limited due to screen size constraints.</p>
+    <button class="mobile-button" onclick="dismissMobileWarning()">Proceed Anyway</button>
+</div>
 <header>
 <a href="javascript:void(0);" onclick="resetGrid();" style="text-decoration: none; cursor: pointer;">
 <img alt="Multiplay Logo" src="multiplay-logo.png" style="max-width: 200px; height: auto;"/>
@@ -541,6 +684,80 @@
         let areVideosMuted = false;
         let areFilenamesVisible = true; // Track filename visibility
         
+        // Function to initialize the UI state
+        function initializeInterface() {
+            // Disable video control buttons initially
+            updateVideoControlsState();
+        }
+        
+        // Function to update video control buttons state based on whether videos are present
+        function updateVideoControlsState() {
+            const hasVideos = videoFiles.length > 0;
+            const videoControlButtons = [
+                document.getElementById('play-pause-all'),
+                document.getElementById('rewind-all'),
+                document.getElementById('mute-toggle'),
+                document.getElementById('sync-all'),
+                document.getElementById('toggle-filenames'),
+                document.getElementById('reset-all')
+            ];
+            
+            videoControlButtons.forEach(button => {
+                if (button) {
+                    button.disabled = !hasVideos;
+                }
+            });
+        }
+        
+        // Function to animate elements on load
+        function setupAnimations() {
+            // Add animation classes to header elements
+            const logo = document.querySelector('header a');
+            const subtitle = document.querySelector('.subtitle');
+            
+            logo.classList.add('animate-scale-in');
+            subtitle.classList.add('animate-fade-in', 'delay-1');
+            
+            // Animate control sections with a staggered delay
+            const leftControls = document.querySelector('.left-controls');
+            const centerControls = document.querySelector('.center-controls');
+            const rightControls = document.querySelector('.right-controls');
+            
+            leftControls.classList.add('animate-fade-in', 'delay-2');
+            centerControls.classList.add('animate-fade-in', 'delay-3');
+            rightControls.classList.add('animate-fade-in', 'delay-4');
+            
+            // Animate grid container
+            const gridContainer = document.getElementById('grid-container');
+            gridContainer.classList.add('animate-scale-in', 'delay-5');
+            
+            // Add animations to buttons in center controls
+            const buttons = centerControls.querySelectorAll('button');
+            buttons.forEach((button, index) => {
+                button.classList.add('animate-fade-in');
+                button.style.animationDelay = `${0.3 + (index * 0.05)}s`;
+            });
+        }
+        
+        // Function to check if the user is on a mobile device
+        function checkMobileDevice() {
+            // Check if the device is mobile (screen width or user agent)
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                            window.innerWidth < 768;
+            
+            if (isMobile) {
+                document.getElementById('mobile-warning').style.display = 'flex';
+            }
+        }
+        
+        // Function to dismiss the mobile warning
+        function dismissMobileWarning() {
+            document.getElementById('mobile-warning').style.display = 'none';
+            
+            // Set a cookie so we don't show the warning again during this session
+            document.cookie = "mobile_warning_dismissed=true; path=/";
+        }
+        
         // Function to toggle info tooltip visibility
         function toggleInfoTooltip(element) {
             const tooltip = element.nextElementSibling;
@@ -576,6 +793,9 @@
             updateGridLayout();
             setupDragAndDrop();
             setupStickyControls();
+            checkMobileDevice();
+            setupAnimations();
+            initializeInterface();
         });
         
         // Setup sticky controls that remain visible when scrolling
@@ -716,7 +936,16 @@
                 emptyGrid.addEventListener('click', function() {
                     document.getElementById('file-input').click();
                 });
+                
+                // Add entrance animation
+                emptyGrid.style.opacity = '0';
                 gridContainer.appendChild(emptyGrid);
+                
+                // Trigger animation after a small delay
+                setTimeout(() => {
+                    emptyGrid.style.transition = 'opacity 0.5s ease-out';
+                    emptyGrid.style.opacity = '1';
+                }, 100);
             } else {
                 // Configure the grid
                 gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
@@ -884,6 +1113,17 @@
             
             cell.appendChild(deleteBtn);
             
+            // Add entrance animation to cell
+            cell.style.opacity = '0';
+            cell.style.transform = 'scale(0.95)';
+            
+            // Trigger animation after a small delay
+            setTimeout(() => {
+                cell.style.transition = 'all 0.3s ease-out';
+                cell.style.opacity = '1';
+                cell.style.transform = 'scale(1)';
+            }, 50);
+            
             // Toggle play/pause on cell click
             cell.onclick = function() {
                 if (video.paused) {
@@ -923,6 +1163,17 @@
             
             cell.innerHTML = '';
             cell.appendChild(placeholder);
+            
+            // Add entrance animation to cell
+            cell.style.opacity = '0';
+            cell.style.transform = 'translateY(10px)';
+            
+            // Trigger animation after a small delay
+            setTimeout(() => {
+                cell.style.transition = 'all 0.3s ease-out';
+                cell.style.opacity = '1';
+                cell.style.transform = 'translateY(0)';
+            }, 50);
             
             // Add click handler to cell to trigger file selection
             cell.onclick = function() {
@@ -1000,6 +1251,9 @@
             
             // Update the grid with the new videos
             updateGridLayout();
+            
+            // Enable video controls
+            updateVideoControlsState();
         }
         
         function togglePlayPauseAll() {
@@ -1200,26 +1454,42 @@
             const playPauseAllBtn = document.getElementById('play-pause-all');
             playPauseAllBtn.innerHTML = '<i class="fas fa-play"></i> Play';
             areVideosPlaying = false;
+            
+            // Disable video control buttons
+            updateVideoControlsState();
         }
         
         // Function to remove a video
         function removeVideo(index) {
-            // Remove the video file from the array
-            videoFiles.splice(index, 1);
+            // Get the cell being removed
+            const cell = document.querySelector(`.video-cell[data-index="${index}"]`);
             
-            // Update the grid
-            updateGridLayout();
-            
-            // Check if we should update the global play state
-            if (videoFiles.length === 0) {
-                // If no videos are left, make sure the play button shows Play All
-                const playPauseAllBtn = document.getElementById('play-pause-all');
-                                    playPauseAllBtn.innerHTML = '<i class="fas fa-play"></i> Play';
-                areVideosPlaying = false;
-            } else {
-                // Otherwise check the current state of the remaining videos
-                checkAllVideosPlaying();
-                checkAllVideosPaused();
+            // Add exit animation
+            if (cell) {
+                cell.style.transition = 'all 0.3s ease-out';
+                cell.style.opacity = '0';
+                cell.style.transform = 'scale(0.95)';
+                
+                // Wait for animation to complete before removing
+                setTimeout(() => {
+                    // Remove the video file from the array
+                    videoFiles.splice(index, 1);
+                    
+                    // Update the grid
+                    updateGridLayout();
+                    
+                    // Check if we should update the global play state
+                    if (videoFiles.length === 0) {
+                        // If no videos are left, make sure the play button shows Play All
+                        const playPauseAllBtn = document.getElementById('play-pause-all');
+                        playPauseAllBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+                        areVideosPlaying = false;
+                    } else {
+                        // Otherwise check the current state of the remaining videos
+                        checkAllVideosPlaying();
+                        checkAllVideosPaused();
+                    }
+                }, 300);
             }
         }
         
