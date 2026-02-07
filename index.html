@@ -289,6 +289,15 @@
             border-color: var(--color-primary-hover);
         }
 
+        #play-pause-all:disabled {
+            background: var(--bg-tertiary);
+            border-color: var(--border-primary);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            opacity: 0.5;
+            box-shadow: none;
+        }
+
         /* Danger button style */
         .btn-danger,
         #reset-all {
@@ -301,6 +310,15 @@
             background: linear-gradient(135deg, var(--color-danger-hover) 0%, #991b1b 100%);
             border-color: var(--color-danger-hover);
             box-shadow: var(--shadow-md), 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        #reset-all:disabled {
+            background: var(--bg-tertiary);
+            border-color: var(--border-primary);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            opacity: 0.5;
+            box-shadow: none;
         }
 
         /* Grid container */
